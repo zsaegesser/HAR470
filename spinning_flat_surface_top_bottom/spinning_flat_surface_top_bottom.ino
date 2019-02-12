@@ -10,6 +10,22 @@ int GND_3 = 4; //Top Layer Ground
 unsigned long time;
 unsigned long myClock;
 boolean reset;
+boolean step_1[3][9] =  {{0,0,0,0,0,0,0,0,0},
+                        { 1,1,1,1,1,1,1,1,1},
+                        { 0,0,0,0,0,0,0,0,0}
+};
+boolean step_2[3][9] =  {{1,0,0,1,0,0,1,0,0},
+                        { 0,1,0,0,1,0,0,1,0},
+                        { 0,0,1,0,0,1,0,0,1}
+};
+boolean step_3[3][9] =  {{0,1,0,0,1,0,0,1,0},
+                        { 0,1,0,0,1,0,0,1,0},
+                        { 0,1,0,0,1,0,0,1,0}
+};
+boolean step_4[3][9] =  {{0,0,1,0,0,1,0,0,1},
+                        { 0,1,0,0,1,0,0,1,0},
+                        { 1,0,0,1,0,0,1,0,0}
+};
 
 void setup() {
   pinMode(latchPin, OUTPUT);
@@ -31,23 +47,35 @@ void loop() {
     myClock = time;
   }
   digitalWrite( SRCLR, HIGH );
-  boolean diamond[3][9] = { {0,0,0,0,1,0,0,0,0},
-                        {0,1,0,1,1,1,0,1,0},
-                        {0,0,0,0,1,0,0,0,0}
-  };
-  boolean full_cube[3][9] = { {1,1,1,1,1,1,1,1,1},
-                        {1,1,1,1,1,1,1,1,1},
-                        {1,1,1,1,1,1,1,1,1}
-  };
-  boolean rev_diamond[3][9] = { {1,1,1,1,0,1,1,1,1},
-                        {1,0,1,0,0,0,1,0,1},
-                        {1,1,1,1,0,1,1,1,1}
-  };
-  if( time - myClock < 1000 ){
-    run_round( diamond );    
+
+  unsigned long checkClock = time - myClock;
+//  if( checkClock < 250 ){
+//    run_round( step_1 );    
+//  }
+//  else if( (checkClock >= 250) && (checkClock < 500) ){
+//    run_round( step_2 );
+//  }
+//  else if( (checkClock >= 500) && (checkClock < 750) ){
+//    run_round( step_3 );
+//  }
+//  else if( (checkClock >= 750) && (checkClock < 1000) ){
+//    run_round( step_4 );
+//  }
+//  else {
+//    reset = 1;
+//  }
+
+  if( checkClock < 100 ){
+    run_round( step_1 );    
   }
-  else if( (time - myClock >= 1000) && (time - myClock < 2000) ){
-    run_round( rev_diamond );
+  else if( (checkClock >= 100) && (checkClock < 200) ){
+    run_round( step_2 );
+  }
+  else if( (checkClock >= 200) && (checkClock < 300) ){
+    run_round( step_3 );
+  }
+  else if( (checkClock >= 300) && (checkClock < 400) ){
+    run_round( step_4 );
   }
   else {
     reset = 1;
