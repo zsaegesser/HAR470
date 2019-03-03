@@ -44,10 +44,10 @@ void loop() {
                         {1,1,1,1,0,1,1,1,1}
   };
   if( time - myClock < 1000 ){
-    run_round( diamond );    
+    run_round( full_cube );    
   }
   else if( (time - myClock >= 1000) && (time - myClock < 2000) ){
-    run_round( rev_diamond );
+    run_round( full_cube );
   }
   else {
     reset = 1;

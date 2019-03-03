@@ -1,8 +1,8 @@
 #include <string.h>
-int latchPin = 11; //Pin connected to ST_CP of 74HC595, latch pin
-int clockPin = 8; //Pin connected to SH_CP of 74HC595, CLK pin
-int dataPin = 12; //Serial input to shift resister
-int SRCLR = 7; //Clear Pin (HIGH = leave it, LOW = wipe output)
+int latchPin = 8; //Pin connected to ST_CP, RCLK of 74HC595, latch pin
+int clockPin = 12; //Pin connected to SH_CP, SRCLK of 74HC595, CLK pin
+int dataPin = 11; //Serial input to shift resister, SER
+int SRCLR = 7; //Clear Pin (HIGH = leave it, LOW = wipe output) SRCLR
 int led_9 = 1; //Center LED, connected directly to pin with 330 ohm resistor
 int GND_1 = 6; //Bottom Layer Ground
 int GND_2 = 5; //Middle Layer Ground
@@ -10,29 +10,17 @@ int GND_3 = 4; //Top Layer Ground
 unsigned long time;
 unsigned long myClock;
 boolean reset;
-boolean step_1[3][9] =  {{0,0,0,0,0,0,0,0,0},
-                        { 1,1,1,1,1,1,1,1,1},
+boolean off[3][9] =  {{0,0,0,0,0,0,0,0,0},
+                        {0,0,0,0,0,0,0,0,0},
                         { 0,0,0,0,0,0,0,0,0}
 };
-boolean step_2[3][9] =  {{1,0,0,1,0,0,1,0,0},
-                        { 0,1,0,0,1,0,0,1,0},
-                        { 0,0,1,0,0,1,0,0,1}
-};
-boolean step_3[3][9] =  {{0,1,0,0,1,0,0,1,0},
-                        { 0,1,0,0,1,0,0,1,0},
-                        { 0,1,0,0,1,0,0,1,0}
-};
-boolean step_4[3][9] =  {{0,0,1,0,0,1,0,0,1},
-                        { 0,1,0,0,1,0,0,1,0},
-                        { 1,0,0,1,0,0,1,0,0}
-};
-
-boolean full[3][9] =  { { 0,1,0,0,0,0,0,0,1},
-                        { 0,1,0,0,0,0,0,0,1},
-                        { 0,1,0,0,0,0,0,0,1}
+boolean on[3][9] =  {{1,1,1,1,1,1,1,1,1},
+                        { 1,1,1,1,1,1,1,1,1},
+                        { 1,1,1,1,1,1,1,1,1}
 };
 
 void setup() {
+  Serial.begin(115200);
   pinMode(latchPin, OUTPUT);
   pinMode(clockPin, OUTPUT);
   pinMode(dataPin, OUTPUT);
@@ -45,49 +33,29 @@ void setup() {
   reset = 0;
 }
 
+
 void loop() {
-  time = millis();
-  if( reset == 1 ){
-    reset = 0;
-    myClock = time;
-  }
   digitalWrite( SRCLR, HIGH );
+  for( int k = 0; k <= 100; k++ ){
+     for( int j = 0; j < 10; j++ ){
+       if( prob( k, 100 ) ){
+          run_round( on );
+       }
+       else {
+          run_round( off );
+       }
+     }
 
-  unsigned long checkClock = time - myClock;
-//  if( checkClock < 250 ){
-//    run_round( step_1 );    
-//  }
-//  else if( (checkClock >= 250) && (checkClock < 500) ){
-//    run_round( step_2 );
-//  }
-//  else if( (checkClock >= 500) && (checkClock < 750) ){
-//    run_round( step_3 );
-//  }
-//  else if( (checkClock >= 750) && (checkClock < 1000) ){
-//    run_round( step_4 );
-//  }
-//  else {
-//    reset = 1;
-//  }
-
-
-  if( checkClock < 100 ){
-    run_round( step_1 );    
   }
-  else if( (checkClock >= 100) && (checkClock < 200) ){
-    run_round( step_2 );
-  }
-  else if( (checkClock >= 200) && (checkClock < 300) ){
-    run_round( step_3 );
-  }
-  else if( (checkClock >= 300) && (checkClock < 400) ){
-    run_round( step_4 );
-  }
-  else {
-    reset = 1;
-  }
-//  run_round(full);
+  reset_leds();
+  delay( 1000 );
+  
 }
+
+boolean prob( int num, int out_of ){
+  return (num) > random(out_of);
+}
+
 
 void run_round( boolean array[3][9] ){
 
